@@ -6,7 +6,8 @@ from ..prefs.common import dataDir
 from sqlite3 import connect
 
 
-def exec_fetchall(conn: Connection, sql):
+def exec_fetchall(sql):
+    conn = create_conn()
     cursor = conn.cursor()
     cursor.execute(sql)
     values = cursor.fetchall()

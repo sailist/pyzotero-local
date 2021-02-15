@@ -21,11 +21,9 @@ access zotero local database and query values
 ```python
 from pprint import pprint
 from pyzolocal.sqls import gets as g
-from pyzolocal.sqls import create_conn
 
-with create_conn() as conn:
-    pprint(g.get_attachments(conn)[:3])
-    pprint(g.get_items_info(conn)[:3])
+pprint(g.get_attachments()[:3])
+pprint(g.get_items_info()[:3])
     # more get function including tag/ collection/ creator/ type
 ```
 
@@ -88,9 +86,26 @@ pprint(res)
 ```  
 
 
+## web api for local database
+**by fastapi**
+ ```python
+from pyzolocal.apis.fastapi import get_fastapis
+
+app = get_fastapis()
+```
+then start it by uvicorn or other asgi framework.
+
+> see [fastapi_demo](./examples/fastapi_demo.py)
+
+
+![](imgs/fastapi2.png)
+![](imgs/fastapi.png)
+
+ - [ ] flask
+
+
 # TODOs
  - [ ] compatible with MacOS and Linux
- - [ ] locally web api support
  - [ ] more synchronize function
  - [ ] pyqt5 wrapper
 

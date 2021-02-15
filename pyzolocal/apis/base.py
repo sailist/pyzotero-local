@@ -1,4 +1,6 @@
 from typing import Dict, Callable
+from ..sqls import create_conn
+from dataclasses import dataclass
 
 
 def get_sql_api_map() -> Dict[str, Callable]:
@@ -9,3 +11,7 @@ def get_sql_api_map() -> Dict[str, Callable]:
 def get_prefs_api_map() -> Dict[str, Callable]:
     from ..prefs import gets
     return {k: gets.__dict__[k] for k in gets.__all__}
+
+
+def collat_from_dataclass(value):
+    pass

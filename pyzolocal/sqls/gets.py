@@ -2,48 +2,47 @@ import os
 import json
 from ..sqls.base import exec_fetchall, pako_inflate
 from typing import List, Dict
-from sqlite3 import Connection
 from ..beans.enum import fileds, itemTypes
 from ..beans import types as t
 
 from collections import defaultdict
 
 
-def get_settings(conn: Connection) -> dict:
+def get_settings() -> dict:
     sql = """
     select value from settings
     """
-    _, values = exec_fetchall(conn, sql)
+    _, values = exec_fetchall(sql)
 
-    return json.loads(pako_inflate(values[0]))
+    return json.loads(pako_inflate(values[0][0]))
 
 
-def get_creators(conn: Connection) -> List[t.Creator]:
+def get_creators() -> List[t.Creator]:
     sql = 'select * from creators'
-    cursor, values = exec_fetchall(conn, sql)
+    cursor, values = exec_fetchall(sql)
     return [t.Creator(creatorID=i[0],
                       firstName=i[1], lastName=i[2], fieldMode=i[3]) for i in values]
 
 
-def get_tags(conn: Connection) -> List[t.Tag]:
+def get_tags() -> List[t.Tag]:
     sql = 'select * from tags'
-    cursor, values = exec_fetchall(conn, sql)
+    cursor, values = exec_fetchall(sql)
 
     return [t.Tag(tagId=i[0], name=i[1])
             for i in values]
 
 
-def get_collections(conn: Connection) -> List[t.Collection]:
+def get_collections() -> List[t.Collection]:
     sql = """
         select * from collections
     """
 
-    cursor, values = exec_fetchall(conn, sql)
+    cursor, values = exec_fetchall(sql)
     return [t.Collection(collectionID=i[0],
                          collectionName=i[1]) for i in values]
 
 
-def get_itemids(conn: Connection, include_delete=False) -> List[int]:
+def get_itemids(include_delete=False) -> List[int]:
     if include_delete:
         sql = f"""
         select itemID from items
@@ -54,11 +53,11 @@ def get_itemids(conn: Connection, include_delete=False) -> List[int]:
         where itemID not in (select itemID from deletedItems)
         """
 
-    cursor, values = exec_fetchall(conn, sql)
+    cursor, values = exec_fetchall(sql)
     return [i[0] for i in values]
 
 
-def get_items_info(conn: Connection) -> List[t.Item]:
+def get_items_info() -> List[t.Item]:
     sql = f"""
     select * from 
         (select * from itemData) 
@@ -67,7 +66,7 @@ def get_items_info(conn: Connection) -> List[t.Item]:
     where itemID not in (select itemID from deletedItems)
     """
 
-    cursor, values = exec_fetchall(conn, sql)
+    cursor, values = exec_fetchall(sql)
 
     if len(values) == 0:
         return []
@@ -80,20 +79,20 @@ def get_items_info(conn: Connection) -> List[t.Item]:
     for item_id, val in item_value_map_.items():
         item_datas = [t.ItemData(fileds(i[1]), i[2], i[3]) for i in val]
         item = t.Item(itemID=item_id,
-                      key=get_item_key_by_itemid(conn, item_id),
+                      key=get_item_key_by_itemid(item_id),
                       itemDatas=item_datas)
         res.append(item)
     return res
 
 
-def get_item_info_by_itemid(conn: Connection, itemID: int) -> t.Item:
+def get_item_info_by_itemid(itemID: int) -> t.Item:
     sql = f"""
     select * from 
         (select * from itemData where itemID={itemID}) 
             inner join itemDataValues using (valueID)
     """
 
-    cursor, values = exec_fetchall(conn, sql)
+    cursor, values = exec_fetchall(sql)
     if len(values) == 0:
         return t.Item(-1)
 
@@ -101,11 +100,11 @@ def get_item_info_by_itemid(conn: Connection, itemID: int) -> t.Item:
 
     item_datas = [t.ItemData(fileds(i[1]), i[2], i[3]) for i in values]
     return t.Item(itemID=item_id,
-                  key=get_item_key_by_itemid(conn, itemID),
+                  key=get_item_key_by_itemid(itemID),
                   itemDatas=item_datas)
 
 
-def get_attachments(conn: Connection) -> List[t.Attachment]:
+def get_attachments() -> List[t.Attachment]:
     """
     all attached files
     :param conn:
@@ -116,7 +115,7 @@ def get_attachments(conn: Connection) -> List[t.Attachment]:
             itemAttachments inner join items using (itemID)
         )
     """
-    cursor, values = exec_fetchall(conn, sql)
+    cursor, values = exec_fetchall(sql)
 
     res = []
     for (itemID, key, contentType, path) in values:
@@ -127,7 +126,7 @@ def get_attachments(conn: Connection) -> List[t.Attachment]:
     return res
 
 
-def get_attachments_by_parentid(conn: Connection, parentItemID: int) -> List[t.Attachment]:
+def get_attachments_by_parentid(parentItemID: int) -> List[t.Attachment]:
     """
     get attached file from parent
     :param conn:
@@ -139,7 +138,7 @@ def get_attachments_by_parentid(conn: Connection, parentItemID: int) -> List[t.A
     where itemID in (select itemID from itemAttachments where parentItemID={parentItemID})
     """
 
-    cursor, values = exec_fetchall(conn, sql)
+    cursor, values = exec_fetchall(sql)
     if len(values) == 0:
         return []
 
@@ -148,8 +147,8 @@ def get_attachments_by_parentid(conn: Connection, parentItemID: int) -> List[t.A
         item_value_map_[value[0]] = value
 
     res = []
-    # item_id_type_map = get_items_type_by_itemids(conn, *list(item_value_map_.keys()))
-    item_id_key_map = get_items_key_by_itemid(conn, *list(item_value_map_.keys()))
+    # item_id_type_map = get_items_type_by_itemids(*list(item_value_map_.keys()))
+    item_id_key_map = get_items_key_by_itemid(*list(item_value_map_.keys()))
 
     for item_id, val in item_value_map_.items():
         path = val[2]  # type:str
@@ -163,7 +162,7 @@ def get_attachments_by_parentid(conn: Connection, parentItemID: int) -> List[t.A
     return res
 
 
-def get_item_attachments_by_parentid(conn: Connection, parentItemID: int) -> List[t.Item]:
+def get_item_attachments_by_parentid(parentItemID: int) -> List[t.Item]:
     """
     get attached item from parent
     :param conn:
@@ -178,7 +177,7 @@ def get_item_attachments_by_parentid(conn: Connection, parentItemID: int) -> Lis
     where itemID in (select itemID from itemAttachments where parentItemID={parentItemID})
     """
 
-    cursor, values = exec_fetchall(conn, sql)
+    cursor, values = exec_fetchall(sql)
     if len(values) == 0:
         return []
 
@@ -187,8 +186,8 @@ def get_item_attachments_by_parentid(conn: Connection, parentItemID: int) -> Lis
         item_value_map_[value[0]].append(value)
 
     res = []
-    item_id_type_map = get_items_type_by_itemids(conn, *list(item_value_map_.keys()))
-    item_id_key_map = get_items_key_by_itemid(conn, *list(item_value_map_.keys()))
+    item_id_type_map = get_items_type_by_itemids(*list(item_value_map_.keys()))
+    item_id_key_map = get_items_key_by_itemid(*list(item_value_map_.keys()))
 
     for item_id, val in item_value_map_.items():
         item_datas = [t.ItemData(fileds(i[1]), i[2], i[3]) for i in val]
@@ -200,14 +199,14 @@ def get_item_attachments_by_parentid(conn: Connection, parentItemID: int) -> Lis
     return res
 
 
-def get_items_info_from_tag_by_tagid(conn: Connection, tagID: int) -> List[t.Item]:
+def get_items_info_from_tag_by_tagid(tagID: int) -> List[t.Item]:
     sql = f"""
     select * from 
         (select * from itemData) 
             inner join itemDataValues using (valueID)
             inner join (select itemID from itemTags where tagID={tagID}) using (itemID)
     """
-    cursor, values = exec_fetchall(conn, sql)
+    cursor, values = exec_fetchall(sql)
 
     if len(values) == 0:
         return []
@@ -217,8 +216,8 @@ def get_items_info_from_tag_by_tagid(conn: Connection, tagID: int) -> List[t.Ite
         item_value_map_[value[0]].append(value)
 
     res = []
-    item_id_type_map = get_items_type_by_itemids(conn, *list(item_value_map_.keys()))
-    item_id_key_map = get_items_key_by_itemid(conn, *list(item_value_map_.keys()))
+    item_id_type_map = get_items_type_by_itemids(*list(item_value_map_.keys()))
+    item_id_key_map = get_items_key_by_itemid(*list(item_value_map_.keys()))
 
     for item_id, val in item_value_map_.items():
         item_datas = [t.ItemData(fileds(i[1]), i[2], i[3]) for i in val]
@@ -230,7 +229,7 @@ def get_items_info_from_tag_by_tagid(conn: Connection, tagID: int) -> List[t.Ite
     return res
 
 
-def get_items_info_from_coll_by_collid(conn: Connection, collID: int) -> List[t.Item]:
+def get_items_info_from_coll_by_collid(collID: int) -> List[t.Item]:
     sql = f"""
     select * from 
         (select * from itemData) 
@@ -238,7 +237,7 @@ def get_items_info_from_coll_by_collid(conn: Connection, collID: int) -> List[t.
             inner join (select itemID from collectionItems where collectionID={collID}) using (itemID)
     """
 
-    cursor, values = exec_fetchall(conn, sql)
+    cursor, values = exec_fetchall(sql)
 
     if len(values) == 0:
         return []
@@ -248,8 +247,8 @@ def get_items_info_from_coll_by_collid(conn: Connection, collID: int) -> List[t.
         item_value_map_[value[0]].append(value)
 
     res = []
-    item_id_type_map = get_items_type_by_itemids(conn, *list(item_value_map_.keys()))
-    item_id_key_map = get_items_key_by_itemid(conn, *list(item_value_map_.keys()))
+    item_id_type_map = get_items_type_by_itemids(*list(item_value_map_.keys()))
+    item_id_key_map = get_items_key_by_itemid(*list(item_value_map_.keys()))
 
     for item_id, val in item_value_map_.items():
         item_datas = [t.ItemData(fileds(i[1]), i[2], i[3]) for i in val]
@@ -261,43 +260,43 @@ def get_items_info_from_coll_by_collid(conn: Connection, collID: int) -> List[t.
     return res
 
 
-def get_items_key_by_itemid(conn: Connection, *itemID: int) -> Dict[int, str]:
+def get_items_key_by_itemid(*itemID: int) -> Dict[int, str]:
     itemID_ = ','.join(f'{i}' for i in itemID)
     sql = f"""
         select itemID,key from items where itemID in ({itemID_})
     """
-    cursor, values = exec_fetchall(conn, sql)
+    cursor, values = exec_fetchall(sql)
 
     items_type = {i[0]: i[1] for i in values}
 
     return items_type
 
 
-def get_item_key_by_itemid(conn: Connection, itemID: int) -> str:
-    return get_items_key_by_itemid(conn, itemID)[itemID]
+def get_item_key_by_itemid(itemID: int) -> str:
+    return get_items_key_by_itemid(itemID)[itemID]
 
 
-def get_items_type_by_itemids(conn: Connection, *itemID: int) -> Dict[int, itemTypes]:
+def get_items_type_by_itemids(*itemID: int) -> Dict[int, itemTypes]:
     itemID_ = ','.join(f'{i}' for i in itemID)
     sql = f"""
         select itemID,itemTypeID from items where itemID in ({itemID_})
     """
-    cursor, values = exec_fetchall(conn, sql)
+    cursor, values = exec_fetchall(sql)
 
     items_type = {i[0]: itemTypes(i[0]) for i in values}
 
     return items_type
 
 
-def get_item_type_by_itemid(conn: Connection, itemID: int) -> itemTypes:
-    return get_item_type_by_itemid(conn, itemID)[0]
+def get_item_type_by_itemid(itemID: int) -> itemTypes:
+    return get_item_type_by_itemid(itemID)[0]
 
 
-def get_item_tags_by_itemid(conn: Connection, itemID: int) -> List[t.Tag]:
+def get_item_tags_by_itemid(itemID: int) -> List[t.Tag]:
     sql = f"""
         select * from
         (select * from itemTags where itemID={itemID})
             inner join tags using (tagID) 
     """
-    cursor, values = exec_fetchall(conn, sql)
+    cursor, values = exec_fetchall(sql)
     return [t.Tag(i[0], i[1]) for i in values]
