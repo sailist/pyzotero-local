@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='zolocal',
-    version='0.1.0',
+    version='0.2.0',
     description='A Python tool kit for interacting with the locally hosted Zotero database.',
     url='https://github.com/sailist/pyzotero-local',
     author='Haozhe Yang',
