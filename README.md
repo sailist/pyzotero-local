@@ -1,6 +1,6 @@
-# zotero-wrapper
+# pyzotero-local
 
-a Python tool kit for interacting with the locally hosted Zotero database.
+A Python tool kit for interacting with the locally hosted Zotero database.
 
 
 # install
