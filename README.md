@@ -2,14 +2,19 @@
 
 A Python tool kit for interacting with the locally hosted Zotero database.
 
+# Features
+ - Well-designed api with typehint, very easy to use.
+ - All path will be located automatically, no need to assign it manually.
 
-# install
+
+
+# Install
 ```shell script
 pip install zolocal
 ```
  
  
-# usage
+# Usage
 
 ## access dataset
 access zotero local database and query values
@@ -89,7 +94,7 @@ pprint(res)
  - [ ] more synchronize function
  - [ ] pyqt5 wrapper
 
-# develop
+# Development
 
 ```shell script
 git clone https://github.com/sailist/pyzotero-local
@@ -139,4 +144,5 @@ pyzolocal
   
 # Related repos
 
- 
+ - [qnotero](https://github.com/ealbiter/qnotero), Standalone sidekick to the Zotero reference manager
+ - [pyzotero](https://github.com/urschrei/pyzotero), A Python client for the Zotero Web API
