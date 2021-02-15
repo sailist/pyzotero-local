@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
+    <data-source source="LOCAL" name="zotero.sqlite" uuid="bb6681cd-3596-4f4e-be81-0e63c3a975e5">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:E:\Python\zotero-wrapper\zotero.sqlite</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="storage.sqlite" uuid="d7257aad-65a3-4c8e-9a83-71e37bc1fe20">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:E:\Python\zotero-wrapper\storage.sqlite</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="places.sqlite" uuid="c8e531b2-27c6-4cba-a0f1-1ba17c23e88f">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:E:\Python\zotero-wrapper\places.sqlite</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="content-prefs.sqlite" uuid="066ab132-9ab4-4e8b-8996-951525e754d9">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:E:\Python\zotero-wrapper\content-prefs.sqlite</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="cookies.sqlite" uuid="ea7b34da-910f-4df8-99b5-96170151daa9">
+      <driver-ref>sqlite.xerial</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:E:\Python\zotero-wrapper\cookies.sqlite</jdbc-url>
+    </data-source>
+  </component>
+</project>
