@@ -13,5 +13,10 @@ def get_prefs_api_map() -> Dict[str, Callable]:
     return {k: gets.__dict__[k] for k in gets.__all__}
 
 
+def get_files_api_map() -> Dict[str, Callable]:
+    from ..files import gets
+    return {k: gets.__dict__[k] for k in gets.__all__}
+
+
 def collat_from_dataclass(value):
     pass

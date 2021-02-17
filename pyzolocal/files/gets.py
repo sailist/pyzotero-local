@@ -8,8 +8,12 @@ import re
 
 match_highlight = re.compile('<b class="match term([0-9]+)">([^<]+)<\/b>')
 
+__all__ = ['search_content']
 
-def search(*content: str, limit=10) -> dict:
+
+
+
+def search_content(*content: str, limit=10) -> dict:
     content = [i.lower() for i in content]
     ix = open_dir(index_root())
     searcher = ix.searcher()

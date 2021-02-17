@@ -67,10 +67,10 @@ index and global search files (supported by [whoosh](https://github.com/mchaput/
 
 ```python
 from pprint import pprint
-from pyzolocal.files import index, search
+from pyzolocal.files import index, search_content
 
 index() # run once when attahed file updated
-res = search('my file')
+res = search_content('my file')
 pprint(res)
 
 
@@ -101,7 +101,14 @@ then start it by uvicorn or other asgi framework.
 ![](imgs/fastapi2.png)
 ![](imgs/fastapi.png)
 
- - [ ] flask
+ **by flask**
+```python
+from pyzolocal.apis.flask import get_flaskapis
+
+app = get_flaskapis()
+app.run()
+```
+then visit http://127.0.0.1:8000/docs to view api list
 
 
 # TODOs

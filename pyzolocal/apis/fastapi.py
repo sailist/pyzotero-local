@@ -4,13 +4,14 @@ except:
     raise ModuleNotFoundError('fastapi not found, run '
                               '     pip install fastapi'
                               ' to install it')
+from .. import __version__
 from .base import get_sql_api_map, get_prefs_api_map
 from fastapi import FastAPI
 from functools import wraps
 
 
 def get_fastapis():
-    app = FastAPI(title='zotero-local')
+    app = FastAPI(title='zotero-local', version=__version__)
     sql_api_map = get_sql_api_map()
 
     def res_wrap(func):
