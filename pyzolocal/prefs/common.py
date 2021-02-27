@@ -48,3 +48,6 @@ def dataDir(path=None):
                       'will return inexist default dataDir. '
                       'You can set data root manually by call `prefs.common.setDataDir()`')
     return res
+
+
+KEY_STORAGE = 'storage'

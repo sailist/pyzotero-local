@@ -1,16 +1,14 @@
 from .base import index_root
+
 from itertools import chain
 
 from whoosh.index import open_dir
 from whoosh.query import *
-
 import re
 
 match_highlight = re.compile('<b class="match term([0-9]+)">([^<]+)<\/b>')
 
 __all__ = ['search_content']
-
-
 
 
 def search_content(*content: str, limit=10) -> dict:

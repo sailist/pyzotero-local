@@ -104,22 +104,29 @@ def get_item_info_by_itemid(itemID: int) -> t.Item:
                   itemDatas=item_datas)
 
 
-def get_attachments() -> List[t.Attachment]:
+def get_attachments(type=-1) -> List[t.Attachment]:
     """
     all attached files
     :param conn:
     :return:
     """
-    sql = """
-        select itemID,key,contentType,path from (
-            itemAttachments inner join items using (itemID)
-        )
-    """
+    if type == -1:
+        sql = """
+            select itemID,key,contentType,path from (
+                itemAttachments inner join items using (itemID)
+            )
+        """
+    else:
+        raise NotImplementedError()
+
     cursor, values = exec_fetchall(sql)
 
     res = []
     for (itemID, key, contentType, path) in values:
-        relpath = os.path.join('storage', key, path.replace('storage:', ''))
+        if path is not None:
+            relpath = os.path.join('storage', key, path.replace('storage:', ''))
+        else:
+            relpath = None
         file = t.Attachment(itemID=itemID, key=key,
                             contentType=contentType, relpath=relpath)
         res.append(file)

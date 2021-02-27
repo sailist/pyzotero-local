@@ -42,8 +42,16 @@ class Attachment:
     contentType: str
     relpath: str
 
-    def abspath(self, root):
-        return os.path.join(root, self.relpath)
+    @property
+    def abspath(self):
+        from ..prefs.common import dataDir
+        return os.path.join(dataDir(), self.relpath)
+
+    @property
+    def is_attachment_url(self):
+        if self.relpath is not None:
+            return 'attachments:' in self.relpath
+        return self.relpath is None
 
 
 @dataclass()
