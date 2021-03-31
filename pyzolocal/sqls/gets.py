@@ -19,7 +19,8 @@ def get_settings() -> dict:
 def get_creator(creatorID:int=-1) -> t.Creator:
     sql = f'select * from creators where creatorID={creatorID}'
     cursor, values = exec_fetchall(sql)
-    return t.Creator(creatorID=i[0],firstName=i[1], lastName=i[2], fieldMode=i[3])
+    values = values[0]
+    return t.Creator(creatorID=values[0],firstName=values[1], lastName=values[2], fieldMode=values[3])
 
 
 def get_creators() -> List[t.Creator]:
@@ -68,8 +69,8 @@ def get_item_creators(itemID:int=-1) -> List[t.Creator]:
     if itemID == -1 : return []
     sql = f'select * from itemCreators where itemID={itemID}'
     cursor, values = exec_fetchall(sql)
-    if len(values) > 0:
-        return [get_creator(value[0]) for value in values]
+    if len(values) != 0:
+        return [get_creator(value[1]) for value in values]
     else:
         return []
 
