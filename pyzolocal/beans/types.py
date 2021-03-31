@@ -17,6 +17,12 @@ class ItemData():
     valueID: int
     value: str
 
+@dataclass()
+class Creator:
+    creatorID: int = -1
+    firstName: str = ""
+    lastName: str = ""
+    fieldMode: int = 0
 
 @dataclass()
 class Item():
@@ -26,6 +32,7 @@ class Item():
     itemID: int = -1
     itemType: itemTypes = None
     key: str = None
+    authors: List[Creator] = None
     itemDatas: List[ItemData] = None
 
 
@@ -54,9 +61,3 @@ class Attachment:
         return self.relpath is None
 
 
-@dataclass()
-class Creator:
-    creatorID: int = -1
-    firstName: str = ""
-    lastName: str = ""
-    fieldMode: int = 0

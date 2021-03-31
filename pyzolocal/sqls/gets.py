@@ -16,12 +16,19 @@ def get_settings() -> dict:
 
     return json.loads(pako_inflate(values[0][0]))
 
+def get_creator(creatorID:int=-1) -> t.Creator:
+    sql = f'select * from creators where creatorID={creatorID}'
+    cursor, values = exec_fetchall(sql)
+    return t.Creator(creatorID=i[0],firstName=i[1], lastName=i[2], fieldMode=i[3])
+
 
 def get_creators() -> List[t.Creator]:
-    sql = 'select * from creators'
+    sql = 'select creatorID from creators'
     cursor, values = exec_fetchall(sql)
-    return [t.Creator(creatorID=i[0],
-                      firstName=i[1], lastName=i[2], fieldMode=i[3]) for i in values]
+    if len(values) > 0:
+        return [get_creator(value[0]) for value in values]
+    else:
+        return []
 
 
 def get_tags() -> List[t.Tag]:
@@ -57,6 +64,17 @@ def get_itemids(include_delete=False) -> List[int]:
     return [i[0] for i in values]
 
 
+def get_item_creators(itemID:int=-1) -> List[t.Creator]:
+    if itemID == -1 : return []
+    sql = f'select * from itemCreators where itemID={itemID}'
+    cursor, values = exec_fetchall(sql)
+    if len(values) > 0:
+        return [get_creator(value[0]) for value in values]
+    else:
+        return []
+
+
+
 def get_items_info() -> List[t.Item]:
     sql = f"""
     select * from 
@@ -77,10 +95,12 @@ def get_items_info() -> List[t.Item]:
 
     res = []
     for item_id, val in item_value_map_.items():
+        item_authors = get_item_creators(item_id)
         item_datas = [t.ItemData(fileds(i[1]), i[2], i[3]) for i in val]
         item = t.Item(itemID=item_id,
                       key=get_item_key_by_itemid(item_id),
-                      itemDatas=item_datas)
+                      itemDatas=item_datas,
+                      authors=item_authors)
         res.append(item)
     return res
 
@@ -99,9 +119,11 @@ def get_item_info_by_itemid(itemID: int) -> t.Item:
     item_id = values[0][0]
 
     item_datas = [t.ItemData(fileds(i[1]), i[2], i[3]) for i in values]
+    item_authors = get_item_creators(item_id)
     return t.Item(itemID=item_id,
                   key=get_item_key_by_itemid(itemID),
-                  itemDatas=item_datas)
+                  itemDatas=item_datas,
+                  authors=item_authors)
 
 
 def get_attachments(type=-1) -> List[t.Attachment]:
@@ -198,10 +220,12 @@ def get_item_attachments_by_parentid(parentItemID: int) -> List[t.Item]:
 
     for item_id, val in item_value_map_.items():
         item_datas = [t.ItemData(fileds(i[1]), i[2], i[3]) for i in val]
+        item_authors = get_item_creators(item_id)
         item = t.Item(itemID=item_id,
                       key=item_id_key_map[item_id],
                       itemType=itemTypes(item_id_type_map[item_id]),
-                      itemDatas=item_datas)
+                      itemDatas=item_datas,
+                      authors=item_authors)
         res.append(item)
     return res
 
@@ -259,10 +283,12 @@ def get_items_info_from_coll_by_collid(collID: int) -> List[t.Item]:
 
     for item_id, val in item_value_map_.items():
         item_datas = [t.ItemData(fileds(i[1]), i[2], i[3]) for i in val]
+        item_authors = get_item_creators(item_id)
         item = t.Item(itemID=item_id,
                       key=item_id_key_map[item_id],
                       itemType=itemTypes(item_id_type_map[item_id]),
-                      itemDatas=item_datas)
+                      itemDatas=item_datas,
+                      authors=item_authors)
         res.append(item)
     return res
 
